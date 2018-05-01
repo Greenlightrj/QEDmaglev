@@ -34,16 +34,16 @@ We found this at https://create.arduino.cc/projecthub/chanhj/magnetic-levitation
 #define MIN_MAG_LIMIT         400        //Trigger point for idle/active mode. If a permanent magnet is in range, hall sensor should read below this value
 #define PID_UPDATE_INTERVAL   1          //PWM update interval, in milliseconds. 0 = as fast as possible, likely unstable due to conditional branching & timing interrupts. Must be < gNextSensorReadout's maximum value
 
-#define DEFAULT_TARGET_VALUE  300       //Default target hall effect readout
-#define DEFAULT_KP            0.7        //Default Kp, proportional gain parameter
+#define DEFAULT_TARGET_VALUE  400//300       //Default target hall effect readout
+#define DEFAULT_KP            10//0.7        //Default Kp, proportional gain parameter
 #ifndef QUIETMODE
-  #define DEFAULT_KD          1.7
+  #define DEFAULT_KD          1.7 //1.7
   //Default Kd, derivative gain parameter
   #else //not QUIETMODE
-  #define DEFAULT_KD            23.7
+  #define DEFAULT_KD          25  //23.7
 #endif //not QUIETMODE
 
-#define DEFAULT_KI            0.0002     //Default Ki, integral gain parameter
+#define DEFAULT_KI            0//0.0002     //Default Ki, integral gain parameter
 #define DEFAULT_MAX_INTEGRAL  5000      //Maximum integral term (limited by signed int below, change to long if > (32,767 - 1024) [1024 because that's the maximum that can be inserted before a constrain operation]
 
 #define KP_INCREMENT          0.1        //Increment used for serial commands (gKp)
@@ -147,6 +147,7 @@ void idleLoop()
     }
     
     int sensorReadout = analogRead(hallSensorPin);
+    //Serial.println(sensorReadout);
     
     //Transition back to active mode if there's a magnet in detection range
     if(MIN_MAG_LIMIT > sensorReadout)
@@ -271,7 +272,8 @@ void serialCommand(char command)
   
   //Why so complicated? Arduino doesn't include support for %f by default and requires an additional library, so we rip it open manually. Will not support negative numbers or indefinite precision.
   //This one line causes 3026 bytes of ROM to be used, almost half the sketch size...so if you run out of space, disable this (or simplify it).
-  sprintf(output, "Target Value: [%3d] Current PWM duty cycle [%3d] Current sensor value [%4d] Kp [%2d.%02d] Kd [%2d.%02d] Ki,Integral Error [.%04d,%d] Idle timeout [%d]\n",
+  
+  /*sprintf(output, "Target Value: [%3d] Current PWM duty cycle [%3d] Current sensor value [%4d] Kp [%2d.%02d] Kd [%2d.%02d] Ki,Integral Error [.%04d,%d] Idle timeout [%d]\n",
     gTargetValue, 
     gCurrentDutyCycle, 
     gNextSensorReadout, 
@@ -282,8 +284,8 @@ void serialCommand(char command)
     roundValue(gKi*10000)%10000, 
     gIntegralError, 
     gIdleTime);
-   
-  Serial.print(output);
+   */
+  //Serial.print(output);
 }
 
 void loop()
@@ -298,5 +300,6 @@ void loop()
     if(gIdle)
       idleLoop();  
     else
-      controlLoop();      
+      controlLoop();   
+    //Serial.println(gNextSensorReadout);
 }

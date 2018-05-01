@@ -16,7 +16,7 @@ void loop() {
    // float voltReadout = (sensorReadout*5 - 2.5)/1024;
    //Serial.println(voltReadout);
 
-    analogWrite(coilPin, 200);
+    analogWrite(coilPin, 50);
    
     delay(100);
 }
